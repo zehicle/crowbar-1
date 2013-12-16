@@ -96,56 +96,23 @@ class Barclamp < ActiveRecord::Base
     puts "ALERT!! change to Barclamp.import for #{bc_name}!"
   end
 
-  def self.import(bc_name, bc=nil, source_path=nil)
+  def self.import(bc_name="crowbar", bc=nil, source_path=nil)
     barclamp = Barclamp.find_or_create_by_name(bc_name)
-    source_path ||= "../barclamps/#{bc_name}"    # would be nice to be smarter, but this is OK for now
-    bc_file = File.expand_path(File.join(source_path, "crowbar.yml"))
+    source_path ||= File.join(Rails.root, '..')
+    bc_file = File.expand_path(File.join(source_path, bc_name)) + '.yml'
+
     # load JSON
     if bc.nil?
       raise "Barclamp metadata #{bc_file} for #{bc_name} not found" unless File.exists?(bc_file)
       bc = YAML.load_file bc_file
-      raise 'Barclamp name must match name from YML file' unless bc['barclamp']['name'].eql? bc_name
     end
 
-    # barclamp data import
-    Barclamp.transaction do
-      # Can't do the || trick booleans because nil is false.
-      amp = bc['barclamp']['allow_multiple_deployments'] rescue nil
-      amp ||= bc['barclamp']['allow_multiple_proposals'] rescue false
-      um = bc['barclamp']['user_managed'] rescue true
-      gitcommit = "unknown" if bc['git'].nil? or bc['git']['commit'].nil?
-      gitdate = "unknown" if bc['git'].nil? or bc['git']['date'].nil?
-      ## TODO: Add checking to validate that adding this barclamp will not
-      ## result in circular dependencies.
-      reqs = if bc['barclamp']['requires'] &&
-                 !bc['barclamp']['requires'].empty?
-               bc['barclamp']['requires'].join(",")
-             elsif bc_name == "crowbar"
-               ""
-             else
-               "crowbar"
-             end
-      Rails.logger.info("#{bc_name} requires #{reqs}")
-      barclamp.update_attributes( :display     => bc['barclamp']['display'] || bc_name.humanize,
-                                  :description => bc['barclamp']['description'] || bc_name.humanize,
-                                  :online_help => bc['barclamp']['online_help'],
-                                  :version     => bc['barclamp']['version'] || 2,
-                                  :api_version => bc['barclamp']['api_version'] || "v2",
-                                  :api_version_accepts => bc['barclamp']['api_version_accepts'] || "|v2|",
-                                  :license     => bc['barclamp']['license'] || "apache2",
-                                  :copyright   => bc['barclamp']['copyright'] || "Dell, Inc 2013",
-                                  :source_path => source_path,
-                                  :user_managed=> um || true,
-                                  :allow_multiple_deployments => amp || false,
-                                  :proposal_schema_version => bc['crowbar']['proposal_schema_version'] || 2,
-                                  :members     => (bc['barclamp']['members'] || []).join(","),
-                                  :requirements => reqs,
-                                  :layout      => bc['crowbar']['layout'] || 2,
-                                  :mode        => "full",
-                                  :build_on    => (gitdate || 'unknown'),
-                                  :commit      => (gitcommit || 'unknown')   )
-      barclamp.save
-    end
+    Rails.logger.info "Importing Barclamp #{bc_name} from #{source_path}"
+
+    # verson tracking
+    gitcommit = "unknown" if bc['git'].nil? or bc['git']['commit'].nil?
+    gitdate = "unknown" if bc['git'].nil? or bc['git']['date'].nil?
+
     # load the jig information.
     bc['jigs'].each do |jig|
       raise "Jigs must have a name" unless jig['name'] && !jig['name'].empty?
@@ -167,6 +134,26 @@ class Barclamp < ActiveRecord::Base
                             :client_role_name => jig_client_role)
       jig.save!
     end if bc["jigs"]
+
+    # load the barclamps submodules information.
+    bc['barclamps'].each do |sub_details|
+
+      name = sub_details['name']
+      subm = Barclamp.find_or_create_by_name :name=>name 
+      # barclamp data import
+      Barclamp.transaction do
+        subm.update_attributes( :display     => sub_details['display'] || name.humanize,
+                                :description => sub_details['description'] || name.humanize,
+                                :version     => bc['version'] || '2.0',
+                                :source_path => source_path,
+                                :build_on    => gitdate,
+                                :commit      => gitcommit )
+        subm.save!
+      end
+
+      Barclamp.import name, nil, File.join(source_path, 'barclamps')
+
+    end if bc["barclamps"]
 
     # iterate over the roles in the yml file and load them all.
     # Jigs are now late-bound, so we just load everything.

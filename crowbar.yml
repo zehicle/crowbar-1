@@ -13,111 +13,36 @@
 # limitations under the License.
 #
 
-barclamp:
-  name: crowbar
-  display: Crowbar
-  description: Self-referential barclamp enabling other barclamps
-  online_help: 'https://crowbar.github.com/'
-  version: 2
-  license: "apache2"
-  copyright: "Dell, Inc 2013"
-  api_version: "v2"
-  api_version_accepts: "v2"
-  proposal_schema_version: 2
-  os_support:
-    - ubuntu-12.04
-    - redhat-6.2
-    - centos-6.2
-    - opensuse-12.3
-    - fedora-18
-    - fedora-19
+version: 2.0
 
-roles:
-  - name: crowbar-admin-node
-    description: "Core Crowbar Services Bundle"
-    jig: noop
-    flags:
-      - bootstrap
-      - implicit
-    requires:
-      - deployer-client
-      - network-server
-      - dns-database
-      - provisioner-dhcp-database
-      - provisioner-repos
-  - name: crowbar-managed-node
-    description: "Crowbar Node Service Bundle"
-    jig: noop
-    flags:
-      - discovery
-      - implicit
-    requires:
-      - deployer-client
-      - logging-client
-      - ntp-client
-      - provisioner-repos
-  - name: crowbar-installed-node
-    description: "Crowbar Node Ready Checkpoint"
-    jig: noop
-    flags:
-      - implicit
-    requires:
-      - crowbar-managed-node
-      - provisioner-os-install
+os_support:
+  - ubuntu-12.04
+  - redhat-6.2
+  - centos-6.2
+  - opensuse-12.3
+  - fedora-18
+  - fedora-19
+
+barclamps:
+  - name: crowbar
+    display: Crowbar
+    description: Self-referential barclamp enabling other barclamps
+  - name: test
+    display: Test
+    description: Test Barclamp Integrations
 
 jigs:
+  # Crowbar Core
   - name: script
     class: 'BarclampCrowbar::Jig'
     description: 'Run arbitrary scripts on nodes via SSH'
   - name: noop
     class: NoopJig
     description: "Jig used when roles have no action to run"
+  - name: test
+    description: 'Test jig for exercising jig and noderole operations.'
+    class: 'BarclampTest::Jig'
 
-attribs:
-  - name: asset_tag
-    map: 'ohai/dmi/base_board/asset_tag'
-    description: 'BIOS configured system identifier'
-  - name: serial_number
-    description: 'System Serial Number'
-    map: 'ohai/dmi/base_board/asset_tag'
-  - name: 'kernel'
-    description: 'Kermel Name'
-    map: 'ohai/kernel/name'
-  - name: 'kernel_version'
-    description: 'Kernel Version'
-    map: 'ohai/kernel/version'
-  - name: 'os'
-    description: 'O/S Name'
-    map: 'ohai/platform'
-  - name: 'os_version'
-    description: 'O/S Version'
-    map: 'ohai/platform_version'
-  - name: 'os_description'
-    description: 'O/S Description'
-    map: 'ohai/lsb/description'
-  - name: 'memory'
-    description: 'System Memory'
-    map: 'ohai/memory/total'
-  - name: 'cpu'
-    description: 'System Processor'
-    map: 'ohai/cpu/0/model_name'
-  - name: 'cpu_count'
-    description: 'Number of Processors'
-    map: 'ohai/cpu/total'
-  - name: 'hardware'
-    description: 'Product Name'
-    map: 'ohai/dmi/system/product_name'
-  - name: 'manufacturer'
-    description: 'Product Vendor'
-    map: 'ohai/dmi/system/manufacturer'
-  - name: 'number_of_drives'
-    description: 'RAID set'
-    map: 'ohai/block_device'
-
-crowbar:
-  layout: 2.0
-  order: 0
-  proposal_schema_version: 2
 
 debs:
   ubuntu-12.04:
