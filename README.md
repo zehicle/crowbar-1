@@ -15,3 +15,11 @@ Crowbar documentation is distributed into multiple places under the /doc directo
 
 > Please, do NOT add documentation in locations besides /doc!  If necessary, expand this README to include pointers to important /doc information.
 
+## Short Term notes for OpenCrowbar Development Environment
+
+1. use the Crowbar ./dev tests setup to position gems
+1. cd crowbar/rails
+1. bundle install --verbose --path /tmp/crowbar-dev-test/gems
+1. script/delayed_job --queue=NodeRoleRunner -n 2 start
+1. rails s Puma development
+1. script/delayed_job stop

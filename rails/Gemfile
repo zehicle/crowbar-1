@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-source "file:///tftpboot/gemsite"
+
+source "file:///tmp/crowbar-dev-test/gemsite"
+# source "file:///tftpboot/gemsite"
+# source 'https://rubygems.org'
 
 gem 'rails', '~> 3.2.13'
 
@@ -24,9 +26,9 @@ gem 'syslogger'
 gem 'kwalify'
 gem 'bluecloth', '>= 2.0.0'
 gem 'puma'
-gem 'amqp'
+#gem 'amqp'
 gem 'xml-simple'
-gem 'daemons'
+#gem 'daemons'
 gem 'active_scaffold'
 gem 'devise', "~>3.0.0"
 gem 'rails_config'
@@ -35,22 +37,18 @@ gem 'delayed_job_active_record'
 
 gem 'jquery-rails'
 
-group :development do
+group :development, :test do
   gem "rails-erd"
+  gem 'simplecov', :platforms => [:ruby_19,:ruby_20]
+  gem 'coveralls', :platforms => [:ruby_19,:ruby_20]
+  gem "factory_girl", "<3.0"
+  gem "factory_girl_rails", "< 3.0"
+  gem 'rspec-rails'
+  gem "email_spec", ">= 1.2.1"
+  gem "database_cleaner", ">= 0.7.2"
+  gem "launchy", ">= 2.1.0"
 end
 
-gem 'simplecov', :platforms => [:ruby_19,:ruby_20], :group => :test, :require => false
-gem 'coveralls', :platforms => [:ruby_19,:ruby_20], :group => :test, :require => false
-
-gem 'rspec-rails', :group => [:development, :test]
-
-# These to require Ruby 1.9.3
-gem "factory_girl", "<3.0" , :group => [:development, :test]
-gem "factory_girl_rails", "< 3.0" , :group => [:development, :test]
-
-gem "email_spec", ">= 1.2.1", :group => [:development, :test]
-gem "database_cleaner", ">= 0.7.2", :group => [:development, :test]
-gem "launchy", ">= 2.1.0", :group => [:development, :test]
 
 # to use digest auth in cli unit tests
 gem 'net-http-digest_auth'
@@ -59,7 +57,7 @@ gem 'net-http-digest_auth'
 # needed by Gemfile.d/*.gemfile so that they can determine the correct
 # path at run-time rather than having to hard-code a path at
 # install-time which may be different and therefore incorrect.
-crowbar_path = File.dirname(__FILE__)
-Dir.glob(File.join(crowbar_path, 'Gemfile.d', '*.gemfile')) do |gemfile|
-    eval(IO.read(gemfile), binding)
-end
+#crowbar_path = File.dirname(__FILE__)-
+#Dir.glob(File.join(crowbar_path, 'Gemfile.d', '*.gemfile')) do |gemfile|
+#    eval(IO.read(gemfile), binding)
+#end
