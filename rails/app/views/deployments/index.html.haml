@@ -1,0 +1,31 @@
+%table{:width=>'100%'}
+  %tr
+    %td
+      %h1= t '.title'
+    %td{:align=>'right'}
+      = form_for :deployment, :'data-remote' => true, :url => deployments_path(), :html => { :method=>:post, :'data-type' => 'html',  :class => "formtastic" } do |f|
+        = text_field_tag :name, t('.default'), :size => 15
+        %input.button{:type => "submit", :name => "create", :method=>:post, :value => t('.create')}
+
+%table.data.box
+  %thead
+    %tr
+      %th= t '.deployment'
+      %th= t '.description'
+      %th= t '.status'
+      %th= t '.active'
+      %th= t '.parent'
+      %th= t '.actions'
+  %tbody
+    - @list.each do |d|
+      - state = d.state
+      %tr
+        %td= link_to d.name, deployment_path(d.id)
+        %td= d.description
+        %td
+          .led{:class => Snapshot::STATES[state], :title=>Snapshot.state_name(state)}
+        %td= link_to d.head.name, snapshot_path(d.head.id), :title=>d.head.description
+        %td
+          - if d.parent_id
+            = link_to d.parent.name, deployment_path(d.parent_id), :title=>d.parent.description
+        %td= render :partial => 'buttons', :locals => { :state=>state, :snapshot=>d.head } rescue 'buttons?'

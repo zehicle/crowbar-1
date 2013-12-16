@@ -1,0 +1,35 @@
+- state = @deployment.state rescue Snapshot::ERROR
+
+%h1
+  = "#{@deployment.name} #{Snapshot.state_name(state)}"
+  = "("
+  = link_to @deployment.head.name, deployment_head_path(@deployment.id)
+  = ")"
+
+%table.plain{:width=>'100%'}
+  %tr
+    %td
+      .led{:class => Snapshot::STATES[state], :title=>Snapshot.state_name(state)}
+    %td
+      = @deployment.description
+    %td{:align=>'right'}
+      = render :partial => 'buttons', :locals => { :state=>state, :snapshot=>@deployment.head }
+  - if @deployment.parent_id
+    %tr
+      %td
+      %td
+        = t '.parent'
+        = link_to @deployment.parent.name, deployment_path(@deployment.parent.id), :title=>@deployment.parent.description
+      %td
+
+
+.clear
+
+
+%h2= t '.nodes'
+= render :partial => 'nodes/index', :locals => { :nodes=>@deployment.nodes.order("name ASC") }
+
+%h2= t '.snapshots'
+= render :partial => 'snapshots/index', :locals => { :list=>@deployment.snapshots.order("id DESC") }
+
+.clear

@@ -1,0 +1,51 @@
+!!!
+%html
+  %head
+    %title= "Crowbar"
+    = csrf_meta_tags
+    = stylesheet_link_tag 'application'
+    /[if IE]
+      = stylesheet_link_tag 'ie', :media => "all"
+    = javascript_include_tag 'application'
+    = csrf_meta_tag
+    %link{:rel=>"SHORTCUT ICON", :href=>"/images/icons/bunny.ico"}
+  
+  %body
+    %header
+      .container
+        %h1
+          %a{:href => "/"}
+            %span logo
+        - if current_user or session[:digest_user]
+          %div{:style=>'float:right; padding-top:10px; z-index:10; height:0px'}
+            -if session[:digest_user]
+              = t 'user.digested_as', :user=>session[:digest_user]
+            -else 
+              = t 'user.signed_in_as', :user=>current_user.username
+            (
+            = link_to t('user.sign_out'), main_app.destroy_user_session_path(), :method=>'delete' rescue t('error')
+            )
+          %nav
+            - unless Rails.env.development? and params[:nav].eql? 'false'
+              = render_navigation :expand_all => true, :skip_if_empty => true
+        - else
+          %nav
+            = link_to t('user.sign_in'),  main_app.new_user_session_path
+    
+    - if flash[:notice]
+      .notice#flash
+        .container
+          %p
+            = flash[:notice]
+            = link_to " [#{t('clear_msg')}]", "#", :onClick=>"$('#flash').attr('style', 'display:none');"
+
+    #main_body.container
+      = yield
+
+    %footer
+      =t '.provided_by'
+      %a{:href=>"http://dell.com/cloud", :target=>"_new"}
+        %img{:src=>"/images/layout/dell.png", :alt=>"Dell, Inc.", :title=>"Dell, Inc.", :style=>"vertical-align:middle;padding-bottom:2px"}
+      %a{:href=>"http://dell.com/crowbar", :target=>"_new", :alt=>"Dell, Inc."}
+        CloudEdge Solutions team
+      =t 'version', :version=>(Rails.env.development? ? "Development" : BarclampCrowbar::Barclamp.all.first.commit)

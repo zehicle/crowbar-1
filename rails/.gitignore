@@ -1,0 +1,16 @@
+.bundle
+db/*.sqlite3
+db/*.json
+log/*.log
+tmp/
+.rvmrc
+config/database.yml
+*~
+.beam
+vendor/cache
+*.swp
+coverage/
+
+config/settings.local.yml
+config/settings/*.local.yml
+config/environments/*.local.yml

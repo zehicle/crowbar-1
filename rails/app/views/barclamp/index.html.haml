@@ -1,0 +1,23 @@
+- if @barclamp.nil?
+  %p{:style => 'float:right'}
+    = t 'all'
+- else
+  %div#logo{:style => 'float:right', :width=>'25%', :border=>0, :visibility=>'hidden'}
+    %img#graphic{:alt=>@title, :width=>'100px'}
+%h1= @title
+
+%table.data.box
+  - if @barclamp.nil?
+    = render :partial => 'barclamp/index'
+  - else
+    = begin render :partial => "barclamp/#{@barclamp.name}/index" rescue (render :partial => 'barclamp/index') end
+
+%h2
+  =t 'work_in_progress', :message=>"polling is disabled"
+  
+:javascript
+  function CB2update() {
+    // missing polling function!!!  please see CB1 code 
+    // https://github.com/cloudedge/barclamp-crowbar/blob/release/fred/master/crowbar_framework/app/views/barclamp/index.html.haml
+  }
+  

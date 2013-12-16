@@ -1,0 +1,56 @@
+%h1
+  = link_to @node_role.snapshot.name, snapshot_path(@node_role.snapshot.id)
+  = link_to @node_role.node.name, node_path(@node_role.node.id)
+  = link_to @node_role.role.name, role_path(@node_role.role.id)
+
+%table.plane
+  %tr
+    %td
+      .led{:class => NodeRole::STATES[@node_role.state || NodeRole::ERROR], :title=>@node_role.state_name}
+    %td
+      = @node_role.state_name
+    - if @node_role.error? || @node_role.active?
+      %td{:width=>'100%', :align=>'right'}
+        = link_to t('.retry'), node_role_retry_path(@node_role.id), :class => 'button', :method=>:put
+
+
+= form_for :node_role, :'data-remote' => true, :url => node_role_path(:id=>@node_role), :html => { :method=>:put, :'data-type' => 'html',  :class => "formtastic" } do |f|
+  - if @node_role.proposed?
+    %p{:style => 'float:right'}
+      %input.button{:type => "submit", :name => "save", :value => t('.save')}
+  %h3= t '.data'
+  - p = "barclamp_#{@node_role.barclamp.name}/node_roles/#{@node_role.role.name}"
+  - begin
+    - if params.include? :raw
+      = render :partial => 'raw', :locals => { :data => @node_role.data, :template => @node_role.role.template }
+    - else
+      = render :partial => p, :locals  => { :data => @node_role.data, :hide => false, :template => @node_role.role.template }
+  - rescue Exception => e
+    = render :partial => 'raw', :locals => { :data => @node_role.data, :hide => false, :template => @node_role }
+    - if e.message.starts_with? "Missing partial #{p}"
+      %p= t '.no_overlay', :overlay=>p
+    - else
+      %p
+        = t 'error'
+        = e.message
+
+%h3
+  %a.toggle.with_label{:href => "#", :id => "#sysdata_toggle", :rel => "sysdata"}= t '.sysdata'
+
+%pre.code{:id=>"sysdata", :style =>"display:none"}= JSON.pretty_generate @node_role.sysdata
+
+%h3
+  %a.toggle.with_label{:href => "#", :id => "#wall_toggle", :rel => "wall"}= t '.wall'
+
+%pre.code{:id=>"wall", :style =>"display:none"}= JSON.pretty_generate @node_role.wall
+
+%hr 
+
+%h3= t '.upstream'
+= render :partial=>'index', :locals => { :list => @node_role.parents }
+
+%h3= t '.downstream'
+= render :partial=>'index', :locals => { :list => @node_role.children }
+
+%h3= t '.runlog'
+%pre= @node_role.runlog

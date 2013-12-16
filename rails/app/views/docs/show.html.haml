@@ -1,0 +1,18 @@
+-# %h1= @doc.description
+
+-# %p= @doc.inspect
+
+%div(class='nav-container')
+  - if @nav_prev
+    %div(class='nav-prev')
+      = link_to "#{t('.nav_prev')} (#{truncate @nav_prev.description})", "/docs/#{@nav_prev.name}"
+  - if @nav_up
+    %div(class='nav-up')
+      = link_to "#{t('.nav_up')} (#{truncate @nav_up.description})", "/docs/#{@nav_up.name}"
+  - if @nav_next
+    %div(class='nav-next')
+      = link_to "#{t('.nav_next')} (#{truncate @nav_next.description})", "/docs/#{@nav_next.name}"
+
+= link_to t('.edit_this_page'), @doc.git_url, :class=>"button", :style=>"float:right"
+
+%p.topic= @text.html_safe rescue "oops, render broken"

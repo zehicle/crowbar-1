@@ -1,0 +1,436 @@
+# Copyright 2013, Dell
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+barclamp:
+  name: crowbar
+  display: Crowbar
+  description: Self-referential barclamp enabling other barclamps
+  online_help: 'https://crowbar.github.com/'
+  version: 2
+  license: "apache2"
+  copyright: "Dell, Inc 2013"
+  api_version: "v2"
+  api_version_accepts: "v2"
+  proposal_schema_version: 2
+  os_support:
+    - ubuntu-12.04
+    - redhat-6.2
+    - centos-6.2
+    - opensuse-12.3
+    - fedora-18
+    - fedora-19
+
+roles:
+  - name: crowbar-admin-node
+    description: "Core Crowbar Services Bundle"
+    jig: noop
+    flags:
+      - bootstrap
+      - implicit
+    requires:
+      - deployer-client
+      - network-server
+      - dns-database
+      - provisioner-dhcp-database
+      - provisioner-repos
+  - name: crowbar-managed-node
+    description: "Crowbar Node Service Bundle"
+    jig: noop
+    flags:
+      - discovery
+      - implicit
+    requires:
+      - deployer-client
+      - logging-client
+      - ntp-client
+      - provisioner-repos
+  - name: crowbar-installed-node
+    description: "Crowbar Node Ready Checkpoint"
+    jig: noop
+    flags:
+      - implicit
+    requires:
+      - crowbar-managed-node
+      - provisioner-os-install
+
+jigs:
+  - name: script
+    class: 'BarclampCrowbar::Jig'
+    description: 'Run arbitrary scripts on nodes via SSH'
+  - name: noop
+    class: NoopJig
+    description: "Jig used when roles have no action to run"
+
+attribs:
+  - name: asset_tag
+    map: 'ohai/dmi/base_board/asset_tag'
+    description: 'BIOS configured system identifier'
+  - name: serial_number
+    description: 'System Serial Number'
+    map: 'ohai/dmi/base_board/asset_tag'
+  - name: 'kernel'
+    description: 'Kermel Name'
+    map: 'ohai/kernel/name'
+  - name: 'kernel_version'
+    description: 'Kernel Version'
+    map: 'ohai/kernel/version'
+  - name: 'os'
+    description: 'O/S Name'
+    map: 'ohai/platform'
+  - name: 'os_version'
+    description: 'O/S Version'
+    map: 'ohai/platform_version'
+  - name: 'os_description'
+    description: 'O/S Description'
+    map: 'ohai/lsb/description'
+  - name: 'memory'
+    description: 'System Memory'
+    map: 'ohai/memory/total'
+  - name: 'cpu'
+    description: 'System Processor'
+    map: 'ohai/cpu/0/model_name'
+  - name: 'cpu_count'
+    description: 'Number of Processors'
+    map: 'ohai/cpu/total'
+  - name: 'hardware'
+    description: 'Product Name'
+    map: 'ohai/dmi/system/product_name'
+  - name: 'manufacturer'
+    description: 'Product Vendor'
+    map: 'ohai/dmi/system/manufacturer'
+  - name: 'number_of_drives'
+    description: 'RAID set'
+    map: 'ohai/block_device'
+
+crowbar:
+  layout: 2.0
+  order: 0
+  proposal_schema_version: 2
+
+debs:
+  ubuntu-12.04:
+    repos:
+      - deb http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe multiverse
+      - deb-src http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe multiverse
+      - deb http://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse
+      - deb-src http://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse
+      - deb http://archive.canonical.com/ubuntu precise partner
+      - deb-src http://archive.canonical.com/ubuntu precise partner
+      - deb http://extras.ubuntu.com/ubuntu precise main
+      - deb-src http://extras.ubuntu.com/ubuntu precise main
+      - deb http://security.ubuntu.com/ubuntu precise-security main restricted universe multiverse
+      - deb-src http://security.ubuntu.com/ubuntu precise-security main restricted universe multiverse
+      - deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main
+      - deb http://get.docker.io/ubuntu docker main
+  #repos:
+    # Rabbit MQ repo
+    #- deb http://www.rabbitmq.com/debian/ testing main
+  required_pkgs:
+    - ruby1.9.1
+    - ruby1.9.1-dev
+    - gcc
+    - tcpdump
+    - libcurl4-gnutls-dev
+    - build-essential
+    - libxml2-dev
+    - zlib1g-dev
+    - ipmitool
+    - efibootmgr
+    - kwalify
+    - curl
+    - vim
+  build_pkgs:
+    - ruby1.9.1
+    - ruby1.9.1-dev
+    - build-essential
+    - libsqlite3-dev
+    - dpkg-dev
+    - libxml2-dev
+    - zlib1g-dev
+    - libxslt1-dev
+  pkgs:
+    # build-essential stuff
+    - build-essential
+    - binutils-doc
+    - autoconf
+    - flex
+    - bison
+    - patch
+    # crowbar stuff
+    - curl
+    - postgresql-9.3
+    - postgresql-client-9.3
+    - postgresql-contrib-9.3
+    - libpq-dev
+    - kwalify
+    - libcurl4-gnutls-dev
+    # minicom stuff
+    - minicom
+    # openldap stuff
+    - libnss-ldap
+    - libpam-ldap
+    - ldap-utils
+    - db4.8-util
+    - slapd
+    # openssh stuff
+    - openssh-client
+    - openssh-server
+    # rabbitmq stuff
+    - rabbitmq-server
+    # ruby stuff
+    - ruby1.9.1
+    - ruby1.9.1-dev
+    # runit stuff
+    - runit
+    # sudo stuff
+    #- sudo
+    # java stuff
+    #- sun-java6-jdk
+    #- sun-java6-jre
+    - dpkg-dev
+    - screen
+    - alien
+    - graphviz
+    - vim
+    # for nokogiri
+    - libxslt1.1
+    # docker support (Ubuntu only for now)
+    - linux-image-generic-lts-raring 
+    - linux-headers-generic-lts-raring
+    - lxc-docker
+
+rpms:
+  redhat-6.4:
+    repos:
+      - rpm http://mirrors.servercentral.net/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
+    build_pkgs:
+      - libcurl-devel
+      - yum-plugin-downloadonly
+      - createrepo
+      - libxml2-devel
+      - mysql-devel
+      - zlib-devel
+      - rubygems
+    required_pkgs:
+      - rubygems
+    pkgs:
+      # openldap stuff
+      - openldap
+      - openldap-servers
+      - openldap-clients
+      - krb5-workstation
+      # openssh stuff
+      - openssh-clients
+      - openssh-server
+      - openssl-devel
+      - vim-enhanced
+  centos-6.4:
+    repos:
+      - rpm http://mirrors.servercentral.net/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
+    build_pkgs:
+      - libcurl-devel
+      - yum-plugin-downloadonly
+      - yum-plugin-priorities
+      - createrepo
+      - libxml2-devel
+      - mysql-devel
+      - zlib-devel
+      - rubygems
+    required_pkgs:
+      - rubygems
+    pkgs:
+      # openldap stuff
+      - openldap
+      - openldap-servers
+      - openldap-clients
+      - krb5-workstation
+      # openssh stuff
+      - openssh-clients
+      - openssh-server
+      - openssl-devel
+      - vim-enhanced
+
+  fedora-18:
+    build_pkgs:
+      - libcurl-devel
+      - yum-plugin-priorities
+      - createrepo
+      - libxml2-devel
+      - mysql-devel
+      - zlib-devel
+    pkgs:
+      # openldap stuff
+      - openldap
+      - openldap-servers
+      - openldap-clients
+      - krb5-workstation
+      # openssh stuff
+      - openssh-clients
+      - openssh-server
+      - openssl-devel
+      - vim-enhanced
+  fedora-19:
+    build_pkgs:
+      - libcurl-devel
+      - yum-plugin-priorities
+      - createrepo
+      - libxml2-devel
+      - zlib-devel
+    pkgs:
+      # openldap stuff
+      - openldap
+      - openldap-servers
+      - openldap-clients
+      - krb5-workstation
+      # openssh stuff
+      - openssh-clients
+      - openssh-server
+      - openssl-devel
+      - vim-enhanced
+  opensuse-12.3:
+    repos:
+      - repo http://download.opensuse.org/repositories/server:/database:/postgresql/openSUSE_12.3/ postgresql
+      - repo http://download.opensuse.org/repositories/devel:/tools/openSUSE_12.3/ devel-libs
+      - repo http://download.opensuse.org/update/12.3/ update-oss
+    build_pkgs:
+      - libcurl-devel
+      - libxml2-devel
+      - zlib-devel
+    pkgs:
+      # openldap stuff
+      - openldap2
+      - openldap2-client
+      - krb5-client
+      - libopenssl-devel
+      - openssl
+      - libssh-devel
+      - vim
+  opensuse-13.1:
+    repos:
+      - repo http://download.opensuse.org/repositories/server:/database:/postgresql/openSUSE_13.1/ postgresql
+      - repo http://download.opensuse.org/repositories/devel:/tools/openSUSE_13.1/ devel-libs
+      - repo http://download.opensuse.org/update/13.1/ update-oss
+    build_pkgs:
+      - libcurl-devel
+      - libxml2-devel
+      - zlib-devel
+    pkgs:
+      # openldap stuff
+      - openldap2
+      - openldap2-client
+      - krb5-client
+      - libopenssl-devel
+      - openssl
+      - libssh-devel
+      - vim
+  required_pkgs:
+    - gcc
+    - gcc-c++
+    - make
+    - zlib-devel
+    - tcpdump
+    - efibootmgr
+    - curl
+    - vim
+  build_pkgs:
+    - ruby-devel
+    - make
+    - gcc
+    - kernel-devel
+  pkgs:
+    # build-essential stuff
+    - gcc
+    - gcc-c++
+    - kernel-devel
+    - make
+    - autoconf
+    - flex
+    - bison
+    - patch
+    # crowbar stuff
+    - curl
+    - createrepo
+    # minicom stuff
+    - minicom
+    # rabbitmq stuff
+    # ruby stuff
+    - ruby
+    - ruby-devel
+    # sudo stuff
+    - sudo
+    - screen
+    - graphviz
+    # postgresql 93 stuff
+    - postgresql93
+    - postgresql93-devel
+    - postgresql93-contrib
+    - postgresql93-server
+    - libxml2-devel
+    - libpq5
+    - libossp-uuid16
+    - libecpg6
+    # openssh stuff
+    - openssh
+
+gems:
+  pkgs:
+    - active_scaffold
+    - amqp
+    - bluecloth
+    - builder
+    - bundler
+    - bunny-(<0.8.0)
+    - cancan
+    - coveralls
+    - database_cleaner
+    - devise-(~>3.0.0)
+    - email_spec
+    - formtastic
+    - haml
+    - highline
+    - i18n
+    - jquery-rails
+    - json-(~>1.7.0)
+    - kwalify
+    - launchy
+    - libxml-ruby
+    - ruby-shadow
+    - net-http-digest_auth
+    - net-ssh
+    - net-ssh-multi
+    - puma
+    - pg
+    - railroad
+    - rails-(~>3.2.13)
+    - rails_config
+    - rails-erd
+    - rake
+    - rcov
+    - rdoc
+    - rest-client
+    # Pinned to not interfere with chefspec.
+    - rspec-rails-(=2.11.4)
+    - sass
+    - sass-rails-(~>3.2.3)
+    - sendfile
+    - simplecov
+    - simple-navigation
+    - state_machine
+    - syslogger
+    - xml-simple
+    - factory_girl_rails-(~>1.7.0)
+    - delayed_job_active_record
+    - delayed_job
+    - daemons

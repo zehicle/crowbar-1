@@ -1,0 +1,21 @@
+- if list.length == 0
+  = t 'no_items'
+- else
+  %table.data.box
+    %thead
+      %tr
+        %th= t '.state'
+        %th= t '.deployment'
+        %th= t '.state'
+        %th= t '.snapshot'
+        %th= t '.description'
+    %tbody
+      - list.each do |i|
+        - state = i.state 
+        %tr
+          %td
+            .led{:class => Snapshot::STATES[state], :title=>Snapshot.state_name(state)}
+          %td= link_to i.deployment.name, deployment_path(i.deployment.id)
+          %td= Snapshot.state_name(state)
+          %td= link_to i.name, snapshot_path(:id=>i.id) 
+          %td= i.description

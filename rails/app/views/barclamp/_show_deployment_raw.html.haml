@@ -1,0 +1,23 @@
+- nodes = nodes_hash()
+- if @role.elements.length > 0
+  %table{:class => "top", :style =>"width: 100%"  }
+    %tr
+      %td{:style => "float left"}
+        = t '.role' 
+      %td
+        = t '.nodes'
+    - @role.elements.sort.each do |key, value|
+      %tr{:class => cycle("odd", "even")}
+        %td{:style => "white-space:nowrap; width: 20%;" }
+          %em
+            %b= key
+        - members = {}
+        - nodes.each { |k,v| members[k] = v if value.member? k }
+        %td
+          - members.sort_by{ |k, v| v[:alias] }.each do |name, node|
+            %div= link_to node[:alias], nodes_path(:selected => node[:handle]), :title=>node[:title]
+
+  .clear
+- else
+  %p= t '.none'
+

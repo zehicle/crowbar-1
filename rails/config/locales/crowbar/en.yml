@@ -1,0 +1,446 @@
+# Copyright 2013, Dell 
+# 
+# Licensed under the Apache License, Version 2.0 (the "License"); 
+# you may not use this file except in compliance with the License. 
+# You may obtain a copy of the License at 
+# 
+#  http://www.apache.org/licenses/LICENSE-2.0 
+# 
+# Unless required by applicable law or agreed to in writing, software 
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+# See the License for the specific language governing permissions and 
+# limitations under the License. 
+
+# Sample localization file for English. Add more files in this directory for other locales.
+# See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+en:
+  common:
+    state: &node_role_states
+      error:      "Error"
+      active:     "Active"
+      todo:       "To Do"
+      transition: "Transition"
+      blocked:    "Blocked"
+      proposed:   "Proposed"
+      archived:   "Archived"
+      committed:  "Committed"
+      alive:      "On"
+      dead:       "Off"
+      "off":      "Off"
+      available:  "Available"
+      reserved:   "Reserved"
+      idle:       "Idle"
+    deployment: &deployment_common
+      deployment: "Deployment"
+      snapshot: "Snapshot"
+      name: "Name"
+      nodes: "Nodes"
+      description: "Description"
+      state: "State"
+      status: "Status"
+      proposed: "Proposed"
+      committed: "Committed"
+      active: "Active"
+      unlinked: "Unlinked"
+      node: "Node"
+      role: "Role"
+      jig: "Jig"
+      barclamp: "Barclamp"
+      template: "Template"
+      cohort: "Cohort"
+    raid: &raid_types
+      JBODOnly: JBOD
+      SingleRaid10: RAID 10
+      SingleRaid1: RAID 1 span
+      SingleRaid5: RAID 5
+      SingleRaid6: RAID 6
+      Raid0: RAID 0 span
+      Raid1: RAID 1 mirror
+      Raid5: RAID 5
+      Raid6: RAID 6
+      Raid10: Raid 10
+      not_set: Not Set
+    # node.bios_set
+    bios: &bios_types
+      Virtualization: Virtualization Flag Enabled
+      Storage: Storage (Virt Off)
+      not_set: Not Set
+    bootenv: &bootenv
+      local: "Local Boot"
+      sledgehammer: "Discovery / Sledgehammer"
+
+
+  # Layout
+  nav:
+    nodes: "Nodes"
+    nodes_description: "Infrastructure Components"
+    groups: "Groups"
+    groups_description: "Node Collections"
+    bulk_edit: "Bulk Edit"
+    bulk_edit_description: "Edit Basic Information for Multiple Nodes"
+
+    deployments: "Deployments"
+    deployments_description: "Orchestration Management"
+    roles: "Roles"
+    roles_description: "Services Provided by Deployment"
+    annealer: "Annealer"
+    annealer_description: "Crowbar Orchestration Engine"
+    layercake: "System Overview"
+    layercake_description: "Visualize Infrastructure in Function Layers"
+
+    utils: "Utilities"
+    utils_description: "Tools and System Functions "
+    util_logs: "Exported Items"
+    util_logs_description: "Download information complied for review"
+    jigs: "Installed Jigs"
+    jigs_description: "Configuration Manager Plug-ins"
+    barclamps: "Barclamps"
+    barclamps_description: "Provisioning and Operations Modules "
+    bootstrap: "Bootstrap"
+    bootstrap_description: "Review Settings for Initial Configuration"
+
+    help: Help
+    help_description: Help
+    wiki: Online Help
+    wiki_description: Online Help
+    docs: Documentation
+    docs_description: Documentation
+
+    users: "Users"
+    manage_users: "Manage Users"
+    manage_users_description: "Add, remove and edit users"
+    sign_out: "Sign Out"
+    sign_out_description: "End the current session"
+
+    books:
+      "framework/barclamps": "Barclamps"
+      "framework/deployguide": "Deploy Guide"
+      "framework/devguide": "Dev Guide"
+      "framework/gettingstarted": "Getting Started"
+      "framework/licenses": "Licenses"
+      "framework/releasenotes": "Release Notes"
+      "framework/userguide": "User Guide"
+      "framework/README": "README"
+
+    scaffold:
+      top: "Scaffolds"
+      top_description: "Developer Tools"
+      barclamps: "Barclamps"
+      jig: "DevOps Jig"
+      attribs: "Attributes"
+      nodes: "Nodes"
+      groups: "Groups"
+      roles: "Roles"
+      deployments: "Deployments"
+      snapshots: "Snapshots"
+      menus: "Menu Items"
+      docs: "Doc Topics"
+      jigs: "Jigs"
+
+    error: Render Error
+
+  # Models  
+  user:
+    sign_in: Sign In
+    sign_out: Sign Out
+    sign_up: "Sign up"
+    signed_in_as: "You are signed in as %{user}"
+    digest_success: User Authenticated using Digest Authentication
+    digested_as: "Digest [%{user}] Authenticated"
+    forgot: "Forgot your password?"
+#    no_confirm: "Didn't receive confirmation instructions?"
+#    no_unlock: "Didn't receive unlock instructions?"
+#    provider: "Sign in with %{provider}"
+    license: License Details
+    license_accept: "By signing in, you are accepting the relevant licenses"
+    options: Options
+
+  deployment:
+    commit:
+      raise: "cannot commit a proposal unless there is no other currently in process"
+    propose: 
+      raise: "snapshot must be active or error to propose"
+  snapshot:
+    recall: "Interrupted_%{name}"
+    recall_status: "Snapshot recalled by user action"
+
+  node_role:
+    data_parse_error: "NodeRole data was not valid agaist schema"
+    cannot_edit_data: "NodeRole data can only be edited in the Proposed state"
+    state:
+      <<: *node_role_states
+
+  # Layout / Views
+  layouts:
+    application:
+      provided_by: Provided by
+    snapshot:
+      anneal:
+        annealling: "Annealing (initiated by user)"
+  attribs:
+    index:
+      title: "Attributes from discovered properties"
+      name: "Name"
+      description: "Description"
+      map: "Map"
+      value: "Value"
+      unresolved: "Missing!"
+  barclamps:
+    index:
+      title: "Installed Barclamps"
+      barclamp: "Barclamp"
+      description: "Description"
+      roles: "Roles"
+    show:
+      roles: "Roles"
+  dashboard:
+    list:
+      title: "Bulk Edit Nodes"
+      name: "Node Name"
+      alias: "Alias"
+      description: "Description"
+      deployment: "Deployment"
+      hint: "edit values then click save > "
+      failed: "Edit failed for %{list}"
+      updated: "Edit succeeded for %{list}"
+    layercake:
+      title: "System Overview"
+      jigs: "Jigs"
+      core: "Core"
+      network: "Network"
+      nodes: "Nodes"
+      os: "Operating Systems"
+      clients: "Infrastructure Clients"
+      services: "Services"
+      apps: "Applications"
+  deployments:
+    index:
+      title: "Deployments"
+      actions: "Actions"
+      default: "default"
+      create: "Add"
+      parent: "Parent"
+      <<: *deployment_common
+    show:
+      snapshots: "History"
+      parent: "Child of "
+      <<: *deployment_common
+    buttons:
+      commit: "Commit"
+      recall: "Interrupt"
+      propose: "Propose"
+      correct: "Correct"
+      anneal: "Annealer"
+  deployment_roles:
+    index:
+      title: "Deployment Roles"
+  docs:
+    index:
+      title: "Documentation"
+      framework_display: "Crowbar Framework"
+      framework_description: "The core Crowbar system"
+      barclamps_display: "Barclamps"
+      barclamps_description: "Crowbar add-ons"
+      toc_title: "Jump to:"
+    show:
+      nav_prev: "previous page"
+      nav_next: "next page"
+      nav_up: "up"
+      edit_this_page: "Edit this page on GitHub"
+  groups:
+    index:
+      title: "Node Groups"
+  jigs:
+    index:
+      title: "Installed Configuration Managers - Jigs"
+      name: Name
+      description: Description
+      active: Active
+      conn: Connection
+      client: Client
+    show:
+      roles: "Roles"
+  nodes:
+    index:
+      title: "Nodes"
+      admin: "Admin?"
+      alias: "Alias"
+      no_nodes: "No Nodes Registered.  Suggested action: configure Crowbar."
+      bootstrap: "Configure System"
+      <<: *deployment_common
+      <<: *node_role_states
+    show:
+      node_roles: "In Process Actions"
+      alive: "Alive"
+      available: "Available"
+      addresses: "Addresses"
+      all_node_roles: "All Node Roles"
+      admin: "(admin)"
+      attribs: "Attributes"
+      name: "Name"
+      description: "Description"
+      value: "Value"
+      name: Full Name
+      mac: MAC Address
+      allocated: Allocated
+      deployment: Deployment
+      ip: IP Address
+      status: Status
+      state: State
+      hardware: Hardware
+      switch_name: "Switch Name"
+      switch_port: "Switch Port"
+      switch_unit: "Switch Unit"
+      switch_name_unit_port: "Switch/Unit/Port"
+      switch_name_port: "Switch Name/Port"
+      switch_no_link: "No Active Uplinks"
+      uptime: Uptime
+      memory: Memory
+      cpu: CPU
+      number_of_drives: Disk Drives
+      description: Description
+      roles: Roles
+      barclamps: Barclamps
+      asset_tag: Service Tag
+      raid: RAID
+      bdd_marker: BDD Marker
+      reserve: "Reserve"
+      release: "Release"
+      bootenv: "Boot Environment"
+      <<: *bootenv
+      <<: *bios_types
+      <<: *raid_types
+      <<: *node_role_states
+  node_roles:
+    index:
+      title: "Node Roles"
+      <<: *deployment_common
+    anneal:
+      title: "Crowbar Annealer Activity Monitor"
+      anneal: "Run Annealer"
+      step: "Single Step"
+      <<: *node_role_states
+    show:
+      data: "User Configuration Data (outbound)"
+      sysdata: "System Configuration Data (outbound)"
+      no_overlay: "No Override using views/node_role/_raw template instead of %{overlay}"
+      retry: "Retry"
+      wall: "System Managed Data (outbound)"
+      wall: "Jig Managed Data (inbound / wall)"
+      upstream: "Upstream Node Roles (blocked by)"
+      downstream: "Downstream Node Roles (blocking)"
+      runlog: "Log Capture (from last run)"
+      save: "Save"
+      saved: "Node Role Data Saved"
+    raw:
+      merged: "Template"
+      override: "Data / Override"
+  roles:
+    common: &roles_common
+      flags: "Flags"
+      library: "Library"
+      implicit: "Implicit"
+      bootstrap: "Bootstrap"
+      discovery: "Discovery"
+      server: "Server"
+      description: "Description"
+      upstream: "Upstream (prerequisites)"
+    index:
+      title: "Roles"
+      <<: *roles_common
+      <<: *deployment_common
+    show:
+      <<: *deployment_common
+      <<: *roles_common
+      save: "Update Template"
+      type: "Type"
+      no_overlay: "No Override using views/node_role/_raw template instead of %{overlay}"
+      model_error: "Overlay model generated error: %{error}"
+    names:
+      role: "Roles"
+  snapshots:
+    index:
+      title: "Snapshots"
+      <<: *deployment_common
+    show:
+      nodes: "Nodes"
+      graph: "Graph"
+      assign: "Assign Nodes to Roles"
+      assigned: "Assigned Nodes to Roles"
+      roles: "Assigned Roles"
+      nodes: "Available Nodes"
+      add_role: "Add Role"
+      must_be_proposed: "WARNING: Deployment must be in Proposed state to make changes."
+      pick: "Add Nodes"
+      pick_hint: "Select additional nodes for this deployment"
+      <<: *deployment_common      
+    anneal:
+      title: "annealing activity"
+      anneal: "Anneal"
+      annealling: "Annealer Started by User Action"
+      <<: *deployment_common      
+      <<: *node_role_states
+    graph:
+      title: "%{snapshot} Graph"
+  support:
+    index:
+      title: Exported Files
+      none_exported: There are no exported files to download
+#      other: Other Files
+#      chef: Chef Objects
+#      bc_import: Barclamp Import Logs
+#      cli: Command Line Utilities
+#      logs: Log Files
+#      delete_hint: Delete File from Export Directory
+#      delete_succeeded: Delete Succeeded
+#      delete_failed: Delete Failed
+#      wait: "Exporting... Please wait or check back later (screen will automatically update when complete)"
+    bootstrap:
+      title: "Initial System Configuration"
+      roles: "Step 1: Review Key Roles"
+      admin_server: "Step 2: Assign Admin Node"
+      create: "Add '%{server}' Node"
+      not_fqdn: "Error: '%{server}' is not fully qualified name."
+      add: "Add '%{role}' Role"
+      monitor: "Step 3: Monitor Installation"
+      anneal: "Annealer View"
+      hint: 'Select Role to edit initial settings'
+      admin_net: 'Core infrastructure network'
+
+  users:
+    common: &user_common
+      email: Email
+      is_admin: Admin?
+      password: Password
+      password_confirmation: Password Confirmation
+      reset_password: Reset Password
+      update: Update User
+      username: Username
+    index:
+      add_user: Add new user
+      create_success: User was created successfully.
+      delete: Delete Selected
+      delete_success: Selected users successfully deleted.
+      delete_users: Delete selected users?
+      failed_attempts: Failed Signins
+      last_sign_in_at: Last Signed In
+      last_sign_in_ip: IP of Last Sign In
+      lock: Lock
+      locked: User account locked.
+      none_selected: No users were selected for deletion.
+      reset_password_success: User password was set successfully.
+      select: Select
+      sign_in_count: Sign In Count
+      title: Manage User Accounts
+      unlock: Unlock
+      unlocked: User account unlocked.
+      update_success: User was updated successfully.
+      <<: *user_common
+    form:
+      add: Add User
+      <<: *user_common
+    form_reset_password:
+      set_password: Set Password
+      <<: *user_common

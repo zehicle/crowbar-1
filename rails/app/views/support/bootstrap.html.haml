@@ -1,0 +1,57 @@
+%h1= t '.title'
+
+.column_40
+
+  %h2
+    = t '.roles'
+
+  %ol
+    - @roles.each do |r|
+      - if r.nil?
+        %li
+          - rnew = 'network-admin'
+          - jigname = Role.find_key('network-server').jig_name
+          %a.button#bootstrap_bootstrap{:remote=>true}
+            = t('.add', :role=>rnew)
+      - else
+        %li
+          %a.role{:href => role_path(r.id, :form=>'true'), :title=>r.description, :id => r.id}= r.name
+
+  %h2= t '.admin_server'
+
+  - if Node.count == 0 
+    - name = %x{hostname -f}.strip
+    - if name =~ Node::FQDN_RE
+      %a.button#bootstrap_adminserver{:remote=>true}
+        = t '.create', :server=>name
+    - else
+      = t '.not_fqdn', :server=>name
+  -else
+    - Node.admin.each do |n|
+      =link_to n.name, node_path(n.id)
+
+  %h2= t '.monitor'
+  = link_to t('.anneal'), annealer_path()
+
+.column_50
+  %p
+  %section.box#role_edit
+    = t '.hint'
+
+:javascript
+
+  $(document).ready(function() {  
+    
+    $.loadDetails('role', 'role_edit');
+
+    $("a#bootstrap_bootstrap").on("click", function() {
+      $.post("#{bootstrap_path()}");
+      location.reload();
+    });
+
+    $("a#bootstrap_adminserver").on("click", function() {
+      $.post("#{make_admin_path(:version=>'v2')}");
+      location.reload();
+    });
+
+  });

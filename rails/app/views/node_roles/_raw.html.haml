@@ -1,0 +1,24 @@
+%div
+  = find_and_preserve do
+    - agent = request.env['HTTP_USER_AGENT']
+    - if agent.nil? or agent.downcase.index('msie 7').nil? 
+      %table.plain{:width=>"100%"}
+        %tr{:align=>'left'}
+          - if template && !hide
+            %th= t '.merged'
+          - if data && !hide
+            %th= t '.override'
+        %tr
+          - if template
+            %td{:valign=>'top'}
+              %textarea.editor{:name => "template"}
+                = JSON.pretty_generate JSON.parse(template) rescue "{}"
+          - if data
+            %td{:valign=>'top'}
+              %textarea.editor{:name => "data"}
+                = JSON.pretty_generate JSON.parse(data) rescue "{}"
+    - else
+      - if data
+        %textarea.editor{:name => "data"}= data
+      - elsif template
+        %textarea.editor{:name => "template"}= template

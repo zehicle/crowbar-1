@@ -1,0 +1,45 @@
+- s = @node.state
+- led = NodeRole::STATES[s]
+- if !@node.available
+  - led = (@node.alive ? 'reserved' : 'idle')
+- elsif !@node.alive
+  - led = 'off'
+
+
+%p{:style => 'float:right'}
+  = link_to t('.all_node_roles'), node_node_roles_path(:node_id=>@node.id), :class => 'button'
+
+%table
+  %tr
+    %td
+      .led{:valign=>'center', :class => led, :title=>t(".#{led}")}
+    %td
+      %h1
+        = @node.alias || @node.name
+        = t '.admin' if @node.admin
+
+= render :partial => 'show', :locals => { :node => @node }
+
+%h3= t '.node_roles'
+- node_roles = NodeRole.committed_by_node(@node).order("cohort, id")
+= render :partial=>'node_roles/index', :locals => { :list => node_roles }
+
+%h3= t '.attribs'
+
+%table.data.box
+  %thead
+    %tr
+      %th= t '.name'
+      %th= t '.value'
+      %th= t '.description'
+  %tbody
+    - @node.attribs.each do |a|
+      %tr
+        %td= link_to a.name, attrib_path(a.id)
+        %td
+          - v = a.get(@node, :discovery) rescue nil
+          - unless v.nil?
+            = v
+          - else
+            %em= t('not_set')
+        %td= a.description

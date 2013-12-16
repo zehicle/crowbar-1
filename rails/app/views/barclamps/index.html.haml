@@ -1,0 +1,19 @@
+%h1= t '.title'
+
+- if @list.length==0
+  %p= t 'no_items'
+- else
+  %table.data.box
+    %thead
+      %tr
+        %th= t '.barclamp'
+        %th= t '.description'
+        %th= t '.roles'
+    %tbody
+      - @list.each do |bc|
+        %tr
+          %td= link_to bc.name, barclamp_path(bc.id)
+          %td= bc.description
+          %td
+            - bc.roles.each do |r|
+              = link_to r.name, role_path(r.id)
