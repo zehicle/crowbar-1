@@ -1,0 +1,91 @@
+# Copyright 2013, Dell
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+roles:
+  # Crowbar  Core
+  - name: crowbar-admin-node
+    description: "Core Crowbar Services Bundle"
+    jig: noop
+    flags:
+      - bootstrap
+      - implicit
+    requires:
+      - deployer-client
+      - network-server
+      - dns-database
+      - provisioner-dhcp-database
+      - provisioner-repos
+  - name: crowbar-managed-node
+    description: "Crowbar Node Service Bundle"
+    jig: noop
+    flags:
+      - discovery
+      - implicit
+    requires:
+      - deployer-client
+      - logging-client
+      - ntp-client
+      - provisioner-repos
+  - name: crowbar-installed-node
+    description: "Crowbar Node Ready Checkpoint"
+    jig: noop
+    flags:
+      - implicit
+    requires:
+      - crowbar-managed-node
+      - provisioner-os-install
+
+attribs:
+  # Crowbar Core
+  - name: asset_tag
+    map: 'ohai/dmi/base_board/asset_tag'
+    description: 'BIOS configured system identifier'
+  - name: serial_number
+    description: 'System Serial Number'
+    map: 'ohai/dmi/base_board/asset_tag'
+  - name: 'kernel'
+    description: 'Kermel Name'
+    map: 'ohai/kernel/name'
+  - name: 'kernel_version'
+    description: 'Kernel Version'
+    map: 'ohai/kernel/version'
+  - name: 'os'
+    description: 'O/S Name'
+    map: 'ohai/platform'
+  - name: 'os_version'
+    description: 'O/S Version'
+    map: 'ohai/platform_version'
+  - name: 'os_description'
+    description: 'O/S Description'
+    map: 'ohai/lsb/description'
+  - name: 'memory'
+    description: 'System Memory'
+    map: 'ohai/memory/total'
+  - name: 'cpu'
+    description: 'System Processor'
+    map: 'ohai/cpu/0/model_name'
+  - name: 'cpu_count'
+    description: 'Number of Processors'
+    map: 'ohai/cpu/total'
+  - name: 'hardware'
+    description: 'Product Name'
+    map: 'ohai/dmi/system/product_name'
+  - name: 'manufacturer'
+    description: 'Product Vendor'
+    map: 'ohai/dmi/system/manufacturer'
+  - name: 'number_of_drives'
+    description: 'RAID set'
+    map: 'ohai/block_device'
+
