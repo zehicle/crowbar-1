@@ -244,22 +244,22 @@ test_scenario(Config, RawSteps, Name) ->
       FinalSteps = lists:reverse(BackwardsFinalSteps),
     
     	% execute all the given steps & put their result into GIVEN
-    	bdd_utils:trace(Config, Name, N, RawSteps, ["No Given: pending next pass..."], ["No When: pending next pass..."]),
+    	bdd_utils:trace(Name, N, RawSteps, ["No Given: pending next pass..."], ["No When: pending next pass..."]),
     	Given = lists:flatten([step_run(Config, [], GS) || GS <- GivenSteps]),
     	% now, excute the when steps & put the result into RESULT
-    	bdd_utils:trace(Config, Name, N, RawSteps, Given, ["No When: pending next pass..."]),
+    	bdd_utils:trace(Name, N, RawSteps, Given, ["No When: pending next pass..."]),
     	When = case length(WhenSteps) of
     	  0 -> Given;
     	  _ -> lists:flatten([step_run(Config, Given, WS) || WS <- WhenSteps])
     	end,
-    	bdd_utils:trace(Config, Name, N, RawSteps, Given, When),
+    	bdd_utils:trace(Name, N, RawSteps, Given, When),
     	% now, check the results
     	Result = lists:flatten([{step_run(Config, When, TS), TS} || TS <- ThenSteps]),
     	% safe to cleanup with the finally steps (we don't care about the result of those)
     	_Final = [{step_run(Config, Given, FS), FS} || FS <- FinalSteps],
     	% now, check the results of the then steps
     	case bdd_utils:assert_atoms(Result) of
-    		true -> bdd_utils:untrace(Config, Name, N), pass;
+    		true -> bdd_utils:untrace(Name, N), pass;
     		_ -> log(info, "*** FAILURE REPORT FOR ~p (~p) ***",[Name, Hash]), bdd_print:fail(lists:reverse(Result)), fail
     	end;
     skip -> skip;

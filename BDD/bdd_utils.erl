@@ -18,7 +18,7 @@
 -export([config/1, config/2, config/3, config_set/2, config_set/3, config_unset/1, config_unset/2]).
 -export([alias/1, alias/2]).
 -export([scenario_store/3, scenario_retrieve/3]).
--export([puts/0, puts/1, puts/2, debug/3, debug/2, debug/1, trace/6, untrace/3]).
+-export([puts/0, puts/1, puts/2, debug/3, debug/2, debug/1, trace/5, untrace/2]).
 -export([log/5, log/4, log/3, log/2, log/1, log_level/1, depricate/4, depricate/6]).
 -export([features/1, features/2, feature_name/2, os_type/0]).
 -export([setup_create/5, setup_create/6, teardown_destroy/3]).
@@ -146,16 +146,16 @@ feature_name(_Config, FileName) ->
 	end.
 
 % Return the file name for the test.  
-trace_setup(Config, Name, nil) ->
-  trace_setup(Config, Name, 0);
+trace_setup(Name, nil) ->
+  trace_setup(Name, 0);
 
-trace_setup(Config, Name, N) ->
+trace_setup(Name, N) ->
   SafeName = clean_line(Name),
-  Prefix = config(trace_location,"../crowbar_framework/tmp/trace_"),
-  string:join([Prefix, config(Config,feature,"unknown"), "-", string:join(string:tokens(SafeName, " "), "_"), "-", integer_to_list(N), ".txt"], "").
+  Prefix = config(trace_location,"/tmp/bdd_trace_"),
+  string:join([Prefix, config(feature,"unknown"), "-", string:join(string:tokens(SafeName, " "), "_"), "-", integer_to_list(N), ".txt"], "").
   
-trace(Config, Name, N, Steps, Given, When) ->
-  File = trace_setup(Config, Name, N),
+trace(Name, N, Steps, Given, When) ->
+  File = trace_setup(Name, N),
   {ok, S} = file:open(File, write),
   lists:foreach(fun(X) -> io:format(S, "~n==== Step ====~n~p", [X]) end, Steps),
   lists:foreach(fun(X) -> io:format(S, "~n==== Given ====~n~p", [X]) end, Given),
@@ -163,8 +163,8 @@ trace(Config, Name, N, Steps, Given, When) ->
   io:format(S, "~n==== End of Test Dump (~p) ====", [N]),
   file:close(S).
 
-untrace(Config, Name, N) ->
-  File = trace_setup(Config, Name, N),
+untrace(Name, N) ->
+  File = trace_setup(Name, N),
   file:delete(File).
 
 marker(Notice) ->
