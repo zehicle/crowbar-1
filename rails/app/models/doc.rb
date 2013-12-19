@@ -36,18 +36,10 @@ class Doc < ActiveRecord::Base
     File.join('../doc')
   end
 
-  def self.doc_path(x)
-    File.join '/docs', x
-  end
-
   # creates the table of contents from the files
   def self.gen_doc_index
-    roots=[]
-    found={}
-    # load crowbar docs
-    Doc.discover_docs nil, 'framework', roots, found
     # load barclamp docs
-    Barclamp.all.each { |bc| Doc.discover_docs bc, bc.name, roots, found }
+    Barclamp.roots.order(:id).each { |bc| Doc.discover_docs bc }
     Doc.all
   end
 
@@ -68,8 +60,9 @@ class Doc < ActiveRecord::Base
   end
 
   # scan the directories and find files
-  def self.discover_docs barclamp, doc_path, roots, found
-    files_list = `cd #{root_directory} && find #{doc_path} -iname *.md`
+  def self.discover_docs barclamp, roots = [], found = {}
+    doc_path = File.join barclamp.source_path, 'doc'
+    files_list = `find #{doc_path} -iname *.md`
     files = files_list.split "\n"
     files = files.sort_by {|x| x.length} # to ensure that parents come before their children
     files.each do |name|

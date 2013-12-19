@@ -19,7 +19,7 @@ class DocsController < ApplicationController
   skip_before_filter :crowbar_auth
 
   def index
-    if Settings.docs.rebuild or params.has_key?(:rebuild)
+    if params.has_key?(:rebuild) # or Settings.docs.rebuild
       # for dev, we want to be able to turn off rebuilds
       Doc.delete_all unless params[:rebuild].eql? "false"
       Doc.gen_doc_index

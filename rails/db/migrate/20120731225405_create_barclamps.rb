@@ -16,7 +16,9 @@ class CreateBarclamps < ActiveRecord::Migration
   def change
     create_table :barclamps do |t|
       t.string     :name
+      t.string     :type
       t.string     :description,               :null=>true
+      t.belongs_to :barclamp,                  :null=>true
       t.integer    :version
       t.string     :source_path,               :null=>true
       t.string     :commit,                    :null=>true, :default=>'unknown'

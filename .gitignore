@@ -8,6 +8,7 @@ trace_*.txt
 /BDD/default.config
 /BDD/dev.config
 /BDD/.*.erl.swp
-/crowbar_framework/log/test.*
-/crowbar_framework/db/node_description.yml
 *.dia.autosave
+/rails/log/test.*
+/rails/db/migrate/20131218165924_create_delayed_jobs.rb
+/rails/script/delayed_job

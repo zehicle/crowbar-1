@@ -15,11 +15,7 @@
 
 class Barclamp < ActiveRecord::Base
 
-  attr_accessible :id, :name, :description, :display, :version, :online_help
-  attr_accessible :user_managed, :type, :source_path, :layout, :commit
-  attr_accessible :requirements, :members
-  attr_accessible :build_on, :mode, :allow_multiple_deployments
-  attr_accessible :api_version, :api_version_accepts, :license, :copyright, :proposal_schema_version
+  attr_accessible :id, :name, :description, :type, :source_path, :barclamp_id, :commit, :build_on
   before_create :create_type_from_name
   #
   # Validate the name should unique
@@ -32,6 +28,11 @@ class Barclamp < ActiveRecord::Base
 
   # Deployment
   has_many :roles,              :dependent => :destroy
+  has_one  :barclamp,           :dependent => :destroy
+  alias_attribute   :parent,    :barclamp
+
+  scope :roots, where(:barclamp_id=>nil)
+
 
   #
   # Order barclamps by their dependency trees and then their name
@@ -92,10 +93,6 @@ class Barclamp < ActiveRecord::Base
 
   end
 
-  def self.import_1x(bc_name, bc=nil, source_path=nil)
-    puts "ALERT!! change to Barclamp.import for #{bc_name}!"
-  end
-
   def self.import(bc_name="crowbar", bc=nil, source_path=nil)
     barclamp = Barclamp.find_or_create_by_name(bc_name)
     source_path ||= File.join(Rails.root, '..')
@@ -147,6 +144,7 @@ class Barclamp < ActiveRecord::Base
                                 :version     => bc['version'] || '2.0',
                                 :source_path => source_path,
                                 :build_on    => gitdate,
+                                :barclamp_id => (subm.id == barclamp.id ? nil : barclamp.id),
                                 :commit      => gitcommit )
         subm.save!
       end

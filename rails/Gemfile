@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-source "file:///tmp/crowbar-dev-test/gemsite"
+source "file:///home/crowbar/cb2/gemsite"
+# source "file:///tmp/crowbar-dev-test/gemsite"
 # source "file:///tftpboot/gemsite"
 # source 'https://rubygems.org'
 
@@ -28,12 +29,13 @@ gem 'bluecloth', '>= 2.0.0'
 gem 'puma'
 #gem 'amqp'
 gem 'xml-simple'
-#gem 'daemons'
+gem 'daemons'
 gem 'active_scaffold'
 gem 'devise', "~>3.0.0"
 gem 'rails_config'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
+#gem 'rails-settings'
 
 gem 'jquery-rails'
 

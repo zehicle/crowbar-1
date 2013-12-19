@@ -20,6 +20,8 @@ Crowbar documentation is distributed into multiple places under the /doc directo
 1. use the Crowbar ./dev tests setup to position gems
 1. cd crowbar/rails
 1. bundle install --verbose --path /tmp/crowbar-dev-test/gems
+1. script/rails generate delayed_job:active_record
+1. rake db:create db:migrate
 1. script/delayed_job --queue=NodeRoleRunner -n 2 start
 1. rails s Puma development
 1. script/delayed_job stop
