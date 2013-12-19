@@ -25,11 +25,11 @@ os_support:
 
 barclamps:
   - name: crowbar
-    display: Crowbar
     description: Self-referential barclamp enabling other barclamps
   - name: test
-    display: Test
     description: Test Barclamp Integrations
+  - name: network
+    description: Network
 
 jigs:
   # Crowbar Core
@@ -136,6 +136,7 @@ debs:
     - linux-headers-generic-lts-raring
     - lxc-docker
 
+
 rpms:
   redhat-6.4:
     repos:
@@ -161,6 +162,9 @@ rpms:
       - openssh-server
       - openssl-devel
       - vim-enhanced
+      # network
+      - vconfig
+      - iptables-ipv6
   centos-6.4:
     repos:
       - rpm http://mirrors.servercentral.net/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
@@ -186,6 +190,9 @@ rpms:
       - openssh-server
       - openssl-devel
       - vim-enhanced
+      # network
+      - vconfig
+      - iptables-ipv6
 
   fedora-18:
     build_pkgs:
@@ -242,6 +249,8 @@ rpms:
       - openssl
       - libssh-devel
       - vim
+      # network
+      - vlan
   opensuse-13.1:
     repos:
       - repo http://download.opensuse.org/repositories/server:/database:/postgresql/openSUSE_13.1/ postgresql
@@ -260,6 +269,8 @@ rpms:
       - openssl
       - libssh-devel
       - vim
+      # network
+      - vlan
   required_pkgs:
     - gcc
     - gcc-c++
@@ -308,7 +319,11 @@ rpms:
     - libecpg6
     # openssh stuff
     - openssh
-
+    # network
+    - bridge-utils
+    - dhcp
+    - iptables
+    
 gems:
   pkgs:
     - active_scaffold

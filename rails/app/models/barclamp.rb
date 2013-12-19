@@ -139,8 +139,7 @@ class Barclamp < ActiveRecord::Base
       subm = Barclamp.find_or_create_by_name :name=>name 
       # barclamp data import
       Barclamp.transaction do
-        subm.update_attributes( :display     => sub_details['display'] || name.humanize,
-                                :description => sub_details['description'] || name.humanize,
+        subm.update_attributes( :description => sub_details['description'] || name.humanize,
                                 :version     => bc['version'] || '2.0',
                                 :source_path => source_path,
                                 :build_on    => gitdate,

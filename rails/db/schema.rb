@@ -13,6 +13,16 @@
 
 ActiveRecord::Schema.define(:version => 20131218165924) do
 
+  create_table "allocations", :force => true do |t|
+    t.integer  "node_id"
+    t.integer  "range_id"
+    t.string   "address",    :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "allocations", ["address"], :name => "index_allocations_on_address", :unique => true
+
   create_table "attribs", :force => true do |t|
     t.integer  "barclamp_id"
     t.integer  "role_id"
@@ -35,7 +45,7 @@ ActiveRecord::Schema.define(:version => 20131218165924) do
     t.integer  "version"
     t.string   "source_path"
     t.string   "commit",      :default => "unknown"
-    t.datetime "build_on",    :default => '2013-12-19 02:18:04'
+    t.datetime "build_on",    :default => '2013-12-19 04:40:23'
     t.datetime "created_at",                                     :null => false
     t.datetime "updated_at",                                     :null => false
   end
@@ -132,6 +142,24 @@ ActiveRecord::Schema.define(:version => 20131218165924) do
     t.datetime "updated_at",                      :null => false
   end
 
+  create_table "networks", :force => true do |t|
+    t.integer  "deployment_id"
+    t.string   "name",                             :null => false
+    t.string   "description"
+    t.integer  "order",         :default => 1000,  :null => false
+    t.integer  "vlan",          :default => 0,     :null => false
+    t.boolean  "use_vlan",      :default => false, :null => false
+    t.boolean  "use_bridge",    :default => false, :null => false
+    t.integer  "team_mode",     :default => 5,     :null => false
+    t.boolean  "use_team",      :default => false, :null => false
+    t.string   "v6prefix"
+    t.string   "conduit",                          :null => false
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+  end
+
+  add_index "networks", ["name"], :name => "index_networks_on_name", :unique => true
+
   create_table "node_groups", :id => false, :force => true do |t|
     t.integer "node_id"
     t.integer "group_id"
@@ -157,7 +185,7 @@ ActiveRecord::Schema.define(:version => 20131218165924) do
     t.text     "wall"
     t.text     "runlog",      :default => "",     :null => false
     t.boolean  "available",   :default => true,   :null => false
-    t.integer  "order",       :default => 983006
+    t.integer  "order",       :default => 424880
     t.datetime "created_at",                      :null => false
     t.datetime "updated_at",                      :null => false
   end
@@ -183,6 +211,17 @@ ActiveRecord::Schema.define(:version => 20131218165924) do
   end
 
   add_index "nodes", ["name"], :name => "index_nodes_on_name", :unique => true
+
+  create_table "ranges", :force => true do |t|
+    t.string   "name",       :null => false
+    t.integer  "network_id"
+    t.string   "first",      :null => false
+    t.string   "last",       :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "ranges", ["name", "network_id"], :name => "index_ranges_on_name_and_network_id", :unique => true
 
   create_table "role_require_attribs", :force => true do |t|
     t.integer  "role_id"
@@ -224,6 +263,14 @@ ActiveRecord::Schema.define(:version => 20131218165924) do
 
   add_index "roles", ["barclamp_id", "name"], :name => "index_roles_on_barclamp_id_and_name", :unique => true
 
+  create_table "routers", :force => true do |t|
+    t.integer  "network_id"
+    t.string   "address",                       :null => false
+    t.integer  "pref",       :default => 65536, :null => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
+  end
+
   create_table "runs", :force => true do |t|
     t.integer "node_role_id",                    :null => false
     t.integer "node_id",                         :null => false
@@ -233,6 +280,13 @@ ActiveRecord::Schema.define(:version => 20131218165924) do
   add_index "runs", ["node_id"], :name => "index_runs_on_node_id"
   add_index "runs", ["node_role_id"], :name => "index_runs_on_node_role_id"
   add_index "runs", ["running"], :name => "index_runs_on_running"
+
+  create_table "settings", :force => true do |t|
+    t.string   "name",       :null => false
+    t.string   "value",      :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "snapshots", :force => true do |t|
     t.integer  "state",         :default => 0,    :null => false

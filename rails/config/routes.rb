@@ -51,6 +51,17 @@ Crowbar::Application.routes.draw do
     put :recall
   end
 
+  namespace :barclamp_network do
+    resources :interfaces
+    resources :networks do
+      get :ranges
+      get :routers
+      get :allocations
+    end
+    # special views
+    get 'map' => "networks#map", :as=> :network_map
+  end
+
   # UI only functionality to help w/ visualization
   scope 'dashboard' do
     get 'list(/:deployment)'  => 'dashboard#list', :as => :bulk_edit
@@ -85,6 +96,10 @@ Crowbar::Application.routes.draw do
       resources :snapshots do as_routes end
       resources :node_roles do as_routes end
       resources :deployment_roles do as_routes end
+      resources :networks do as_routes end
+      resources :routers do as_routes end
+      resources :ranges do as_routes end
+      resources :allocations do as_routes end
     end
   end
 
@@ -142,7 +157,18 @@ Crowbar::Application.routes.draw do
               get 'nodes'
             end
           end
-
+          namespace :barclamp_network do
+            resources :networks do
+              resources :ranges
+              resources :routers
+              member do
+                match 'ip'
+                post 'allocate_ip'
+                get 'allocations'
+              end
+            end
+          end
+          resources :interfaces
           resources :runs
           resources :jigs
           resources :nodes do
@@ -182,10 +208,14 @@ Crowbar::Application.routes.draw do
     end # id constraints
   end # json
 
-  # Install route from each barclamp (should be done last so CB gets priority)
-  Dir.glob(File.join(File.dirname(__FILE__), 'routes.d', '*.routes')) do |routes_file|
-    eval(IO.read(routes_file), binding)
+  # Install route from each root barclamp (should be done last so CB gets priority)
+  begin
+    Barclamp.roots.each do |bc|
+      eval(IO.read(File.path(bc.source_path, "rails", "config", "routes.rb")), binding) unless bc.name.eql? 'crowbar'
+    end
+  rescue
+    # startup cannot resolve Barclamp
   end
 
-  root :to => "nodes#index"
+  root :to => 'dashboard#layercake'
 end

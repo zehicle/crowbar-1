@@ -1,0 +1,200 @@
+#!/usr/bin/env ruby
+# Copyright 2013, Dell
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+
+require File.join(File.expand_path(File.dirname(__FILE__)), "barclamp_lib")
+API_PATH = 'network/v2/networks'
+
+
+@commands["deallocate_ip"] = [ "deallocate_ip(ARGV.shift,ARGV.shift)",
+                               "deallocate_ip <node_id> <cidr> - Deallocate an address from a node on a network" ]
+@commands["allocate_ip"] = [ "allocate_ip(ARGV.shift,ARGV.shift,ARGV.shift,ARGV.shift)",
+                             "allocate_ip <network_id> <node_id> <range> [suggestion] - Allocate an ip for a node on a network from a range" ]
+@commands["enable_interface"] = [ "enable_interface(ARGV.shift,ARGV.shift)",
+                                  "enable_interface <network_id> <node_id> - Ensure that an interface is present for the specified network" ]
+@commands["list"] = [ "list()", "list - Show a list of current networks" ]
+@commands["show"] = [ "show(ARGV.shift)", "show <network_id> - Show a specific network" ]
+@commands["create"] = [ "create(ARGV.shift,ARGV.shift,ARGV.shift,ARGV.shift,ARGV.shift,ARGV.shift,ARGV.shift,ARGV.shift,ARGV.shift,ARGV.shift)",
+                        "create <deployment> <name> <conduit> <ip_ranges> [router] [vlan] [use_vlan] [team_mode] [use_team] [use_bridge] - Create a network" ]
+@commands["edit"] = [ "edit(ARGV.shift,ARGV.shift,ARGV.shift,ARGV.shift)",
+                      "edit <network_id> <conduit> <ip_ranges> <router> - Edit a network" ]
+@commands["delete"] = [ "delete(ARGV.shift)", "delete <network_id> - Delete a network" ]
+
+
+def enable_interface(network_id, node_id)
+  STDERR.puts("Enabling an interface without assigning an IP address is not allowed for now.")
+  exit 1
+end
+
+
+def allocate_ip(network_id, node_id, range, suggestion)
+  usage 1 if network_id.nil? or network_id == ""
+  usage 1 if node_id.nil? or node_id == ""
+  usage 1 if range.nil? or range == ""
+
+  @data = { "node_id" => node_id, "range" => range }
+  @data["suggestion"] = suggestion if suggestion
+  @data = @data.to_json
+
+  struct = put_json2("#{API_PATH}/#{network_id}/allocate_ip", @data)
+
+  case struct[1]
+  when 200
+    [ "Allocated #{struct[0].inspect}",0 ]
+  when 404
+    [ "Failed to allocate IP for network #{network_id}, node #{node_id}, range #{range}: Not Found", 1 ]
+  when 400
+    [ "Failed to allocate IP for network #{network_id}, node #{node_id}, range #{range}:Errors in data\n#{struct[0]}", 1 ]
+  else
+    [ "Failed to talk to service allocate_ip for network #{network_id}, node #{node_id}: #{struct[1]}: #{struct[0]}", 1 ]
+  end
+end
+
+
+def deallocate_ip(network_id, node_id, address)
+  STDERR.puts("Cannot deallocate addresses for now")
+  exit 1
+  usage -1 if network_id.nil? or network_id == ""
+  usage -1 if node_id.nil? or node_id == ""
+
+  @data = { "node_id" => node_id, "address" => address }.to_json
+  struct = put_json2("#{API_PATH}/#{network_id}/deallocate_ip", @data)
+
+  case struct[1]
+  when 200
+    [ "Deallocated IP address for network #{network_id}, node #{node_id}", 0 ]
+  when 404
+    [ "Failed to deallocate IP address for network #{network_id}, node #{node_id}: Not Found", 1 ]
+  when 400
+    [ "Failed to deallocate IP address for network #{network_id}, node #{node_id}: Errors in data\n#{struct[0]}", 1 ]
+  else
+    [ "Failed to talk to service deallocate_ip for network #{network_id}, node #{node_id}: #{struct[1]}: #{struct[0]}", 1 ]
+  end
+end
+
+
+def list(deployment_id)
+  struct = get_json2(API_PATH)
+
+  if struct[1] != 200
+    [ "Failed to talk to service network list: #{struct[1]}: #{struct[0]}", 1 ]
+  elsif struct[0].nil? or struct[0].empty?
+    [ "No current networks", 0 ]
+  else
+    [ JSON.pretty_generate(struct[0]), 0]
+  end
+end
+
+
+def show(network_id)
+  usage -1 if network_id.nil? or network_id == ""
+
+  struct = get_json2("#{API_PATH}/#{network_id}")
+
+  if struct[1] == 200
+    [ "#{JSON.pretty_generate(struct[0])}", 0 ]
+  elsif struct[1] == 404
+    [ struct[0], 1 ]
+  else
+    [ "Unable to retrieve network #{id}: #{struct[1]} - #{struct[0]}", 1 ]
+  end
+end
+
+
+def create(deployment_id, name, conduit, subnet, ip_ranges, router, vlan, use_vlan,team_mode, use_team, use_bridge)
+  usage -1 if deployment_id.nil? or deployment_id == ""
+  usage -1 if name.nil? or name == ""
+  usage -1 if conduit.nil?
+  usage -1 if ip_ranges.nil? or ip_ranges == ""
+  # router_pref is not required
+  # router_ip is not required
+
+  @data = {
+    "deployment_id" => deployment_id,
+    "name" => name,
+    "conduit" => conduit,
+    "ip_ranges" => JSON.parse(ip_ranges),
+    "router" => JSON.parse(router),
+    "vlan" => vlan || 0,
+    "use_vlan" => !!use_vlan,
+    "team_mode" => team_mode || 0,
+    "use_team" => !!use_team,
+    "use_bridge" => !!use_bridge
+  }.to_json
+  struct = post_json2(API_PATH, @data)
+
+  if struct[1] == 200
+    [ "Created network #{name}", 0 ]
+  elsif struct[1] == 400
+    [ "Failed to create network: #{name} : Errors in data\n#{struct[0]}", 1 ]
+  else
+    [ "An error occured while creating the network: #{struct[1]}: #{struct[0]}", 1 ]
+  end
+end
+
+
+def edit(deployment_id, network_id, conduit_id, subnet, dhcp_enabled, ip_ranges, router_pref, router_ip)
+  STDERR.puts("Editing a network not supported right now.")
+  exit 1
+  usage -1 if deployment_id.nil? or deployment_id == ""
+  usage -1 if network_id.nil? or network_id == ""
+  usage -1 if conduit_id.nil? or conduit_id == ""
+  usage -1 if dhcp_enabled.nil? or dhcp_enabled == ""
+  usage -1 if ip_ranges.nil? or ip_ranges == ""
+  # router_pref is not required
+  # router_ip is not required
+
+  @data = {
+      "name" => network_id,
+      "conduit_id" => conduit_id,
+      "subnet" => subnet,
+      "dhcp_enabled" => dhcp_enabled,
+      "ip_ranges" => JSON.parse(ip_ranges),
+      "router" => JSON.parse(router)
+    }.to_json
+
+  struct = put_json2("#{@barclamp}/v2/deployments/#{deployment_id}/networks/#{network_id}", @data)
+
+  if struct[1] == 200
+    [ "Edited #{network_id}", 0 ]
+  elsif struct[1] == 404
+    [ "Failed to edit network: #{network_id} : Not Found", 1 ]
+  elsif struct[1] == 400
+    [ "Failed to edit network: #{network_id} : Errors in data\n#{struct[0]}", 1 ]
+  else
+    [ "An error occured while editing the network: #{struct[1]}: #{struct[0]}", 1 ]
+  end
+end
+
+
+def delete(deployment_id, network_id)
+  STDERR.puts("Deleting a network not supported right now.")
+  exit 1
+  usage -1 if deployment_id.nil? or deployment_id == ""
+  usage -1 if network_id.nil? or network_id == ""
+
+  struct = delete_json2("#{@barclamp}/v2/deployments/#{deployment_id}/networks/#{network_id}")
+
+  if struct[1] == 200
+    [ "Deleted network #{network_id}", 0 ]
+  elsif struct[1] == 404
+    [ struct[0], 1 ]
+  else
+    [ "Failed to talk to service delete: #{struct[1]}: #{struct[0]}", 1 ]
+  end
+end
+
+main
