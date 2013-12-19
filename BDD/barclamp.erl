@@ -26,24 +26,19 @@ g(Item) ->
     atom -> barclamp1;
     _ -> crowbar:g(Item)
   end.
-  
+
 % Common Routine
 % Makes sure that the JSON conforms to expectations (only tests deltas)
 validate(JSON) when is_record(JSON, obj) ->
   J = JSON#obj.data,
   R =[JSON#obj.type == "barclamp",
-      bdd_utils:is_a(J, boolean, user_managed), 
-      bdd_utils:is_a(J, number, layout), 
-      bdd_utils:is_a(J, boolean, allow_multiple_deployments), 
-      bdd_utils:is_a(J, number, proposal_schema_version), 
-      bdd_utils:is_a(J, string, mode), 
-      bdd_utils:is_a(J, string, display), 
+      bdd_utils:is_a(J, string, version), 
       bdd_utils:is_a(J, string, commit), 
+      bdd_utils:is_a(J, string, build_on), 
       bdd_utils:is_a(J, string, source_path), 
-      bdd_utils:is_a(J, string, api_version), 
-      bdd_utils:is_a(J, string, api_version_accepts), 
-      bdd_utils:is_a(J, number, version), 
-      bdd_utils:is_a(J, length, 22),
+      bdd_utils:is_a(J, string, type), 
+      bdd_utils:is_a(J, dbid, barclamp_id), 
+      bdd_utils:is_a(J, length, 8),
       crowbar_rest:validate(J)],
   bdd_utils:assert(R, debug);
 validate(JSON) -> 
