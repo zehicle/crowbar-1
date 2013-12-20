@@ -1,6 +1,14 @@
 # OpenCrowbar Documentation README
 
-_This is not the documentation you are looking for, it is a pointer to the real documentation_
+The OpenCrowbar organization is the future home of the Crowbar 2 code base.  It is in the process of being restructured and ported over from the [The Crowbar 1.x Repo](http://github.com/crowbar) (where Crowbar 1 is being actively sustained).  
+
+The new structure is designed to make it much simpler to use, install and contribute the the Crowbar project.  Specifically, the new layout:
+
+1. Clusters various components (barclamps) into workload groups so that they can be versioned and tracked together
+2. Changes the installation to use RPM/DEB based packages instead of a composed ISO with all components
+3. Splits out the monolithic dev tooling that handled build, test and package
+4. Uses the "crowbar" repo as the base repo (instead of "barclamp-crowbar")
+5. Does not include legacy Crowbar documentation that do not apply to Crowbar.
 
 ## Looking for Crowbar Resources?
 
